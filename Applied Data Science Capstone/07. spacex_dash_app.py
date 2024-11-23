@@ -87,20 +87,29 @@ def get_pie_chart(entered_site):
              Input(component_id='payload-slider', component_property='value')])
             
 def get_scatterplot(entered_site, payload_mass_range):
+    min_mass = payload_mass_range[0]
+    max_mass = payload_mass_range[1]
+
+    filtered_payload = (spacex_df['Payload Mass (kg)'] > min_mass) & \
+                        (spacex_df['Payload Mass (kg)'] < max_mass)
+
+    filtered_df = spacex_df[filtered_payload]
+    
+    
+    
     if entered_site == 'ALL':
-        fig = px.scatter(spacex_df, x='Payload Mass (kg)',
+        fig = px.scatter(filtered_df, x='Payload Mass (kg)',
                     y='class',
                     color='Launch Site',
-                    title=f'Correlation between Payload and Success for all sites')
+                    title=f'Correlation between Payload ({min_mass}-{max_mass}) and Success for all sites')
     else:
-        filtered_df = spacex_df[(spacex_df['Launch Site'] == entered_site) & 
-                                (spacex_df['Payload Mass (kg)'] > payload_mass_range[0]) &
-                                (spacex_df['Payload Mass (kg)'] < payload_mass_range[1])]
-
+        filtered_df = spacex_df[(spacex_df['Launch Site'] == entered_site) &
+                                 filtered_payload]
+                
         fig = px.scatter(filtered_df, x='Payload Mass (kg)',
                          y='class',
                          color='Booster Version Category',
-                         title=f'Correlation between Payload and Success for {entered_site}')
+                         title=f'Correlation between Payload ({min_mass}-{max_mass}) and Success for {entered_site}')
     return fig
     
 
